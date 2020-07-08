@@ -1,0 +1,119 @@
+﻿<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<script src="Template.js"></script>
+<template class="indicators_template">
+    <div id="request-escalation-indicators-grid" style="display:inline-flex;position:absolute;right:0;">
+        <span id="request-escalation-indicators-section-sla" style="display:inline-flex;" title="SLA Escalation Level">
+            <span class="cell-default cell-slaEscalationLevelHeader" style="display:inline-flex;margin:0;"><span></span></span>
+            <span id="request-escalation-indicators-sla" class="cell-default cell-icon cell-escalationLevel cell-slaEscalationLevel" style="display:inline-flex;padding-right:10px;"><span class="escalation6"></span></span>
+        </span>
+        <span id="request-escalation-indicators-section-ola" style="display:inline-flex;" title="OLA Escalation Level">
+            <span class="cell-default cell-olaEscalationLevelHeader" style="display:inline-flex;margin:0;"><span></span></span>
+            <span id="request-escalation-indicators-ola" class="cell-default cell-icon cell-escalationLevel cell-olaEscalationLevel" style="display:inline-flex;padding-right:10px;"><span class="escalation3"></span></span>
+        </span>
+        <span id="request-escalation-indicators-section-uc" style="display:inline-flex;" title="UC Escalation Level">
+            <span class="cell-default cell-ucEscalationLevelHeader" style="display:inline-flex;margin:0;"><span></span></span>
+            <span id="request-escalation-indicators-uc" class="cell-default cell-icon cell-escalationLevel cell-ucEscalationLevel" style="display:inline-flex;padding-right:10px;"><span class="escalation1"></span></span>
+        </span>
+    </div>
+</template>
+<script>
+    (function () {
+
+        var _pluginId = "marval-baltic-plugins-request-sli";
+        if (window.top.document.getElementById(_pluginId + "-defined")) return;
+
+        var MarvalSoftware = window.top.MarvalSoftware;
+        var $ = window.top.$;
+        MarvalSoftware.Plugins.define(_pluginId,
+            {
+                _pluginDebug: true,
+                _pluginHandlerRequest: null,
+
+                _getPluginPath: function () {
+                    return this.attributes["data-pluginpath"].value;
+                },
+                init: function () {
+                    this._log("Starting plugin script...");
+                    if (
+                        MarvalSoftware.UI.Controls.ScriptManager.getInstance().getControl("__Page") == null
+                        ||
+                        MarvalSoftware.UI.Controls.ScriptManager.getInstance().getControl("__Page")._requestId == null
+                        ||
+                        MarvalSoftware.UI.Controls.ScriptManager.getInstance().getControl("__Page")._requestId == 0
+                    ) {
+                        this._log("No request found! Plugin script has been cancelled.");
+                        return;
+                    }
+                    this._getRequestEscalationLevels(
+                        this,
+                        this._injectHtmlContent
+                    );
+                    // creating element to have a flag whether plugin has been defined. To avoid defining duplicated plugin in summary pages.
+                    var plgn_def = window.top.document.createElement("SPAN"); plgn_def.id = _pluginId + "-defined"; window.top.document.body.appendChild(plgn_def);
+                },
+                _getFirstChild: function (el) {
+                    var firstChild = el.firstChild;
+                    while (firstChild != null && firstChild.nodeType == 3) { // skip Mozilla TextNodes
+                        firstChild = firstChild.nextSibling;
+                    }
+                    return firstChild;
+                },
+                _getRequestEscalationLevels: function (plugin, callback) {
+                    if (this._pluginHandlerRequest) {
+                        this._pluginHandlerRequest.abort();
+                        this._pluginHandlerRequest = null;
+                    }
+                    var requestId = MarvalSoftware.UI.Controls.ScriptManager.getInstance().getControl("__Page")._requestId;
+                    this._log("Calling plugin handler: " + this._getPluginPath() + "RequestSLIHandler.ashx?RequestId=" + requestId);
+                    this._pluginHandlerRequest = $.ajax({
+                        type: "GET",
+                        url: this._getPluginPath() + "RequestSLIHandler.ashx?RequestId=" + requestId,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (result) {
+                            callback(plugin, result);
+                        }.bind(this),
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            if (xhr.status > 0) {
+                                this._showErrorMessage("Plugin Error", xhr.status + '\n' + thrownError);
+                            }
+                        }.bind(this)
+                    });
+                },
+                _injectHtmlContent: function (plugin, escalationLevels) {
+                    plugin._log("escalationLevels=" + JSON.stringify(escalationLevels));
+                    var sl_container = $("body > form > #container > #content > #innerContent > .request .levelsOfService");
+                    if(sl_container.length > 0) {
+                        plugin._log("Injecting HTML content...");
+                        var htmlContent = document.createElement('DIV');
+                        htmlContent.innerHTML = document.querySelector('.indicators_template').innerHTML;
+                        
+                        $(htmlContent).find("#request-escalation-indicators-sla > span").attr("class","escalation" + escalationLevels.Sla);
+                        $(htmlContent).find("#request-escalation-indicators-section-sla").attr("title","SLA Escalation Level: " + escalationLevels.Sla);
+
+                        $(htmlContent).find("#request-escalation-indicators-ola > span").attr("class","escalation" + escalationLevels.Ola);
+                        $(htmlContent).find("#request-escalation-indicators-section-ola").attr("title","OLA Escalation Level: " + escalationLevels.Ola);
+
+                        $(htmlContent).find("#request-escalation-indicators-uc > span").attr("class","escalation" + escalationLevels.Uc);
+                        $(htmlContent).find("#request-escalation-indicators-section-uc").attr("title","UC Escalation Level: " + escalationLevels.Uc);
+
+                        sl_container[0].insertBefore(plugin._getFirstChild(htmlContent), sl_container[0].childNodes[0]);
+                    }
+                    else {
+                        plugin._log("Service Levels container not found...");
+                    }
+                },
+                _showErrorMessage: function (title, message) {
+                    MarvalSoftware.UI.MessageBox.show(
+                        title,
+                        message,
+                        MarvalSoftware.UI.MessageBox.Types.ERROR,
+                        null,
+                        null,
+                        400
+                    );
+                },
+                _log: function (s) { if (this._pluginDebug === true) console.log(s); }
+            });
+    })();
+</script>

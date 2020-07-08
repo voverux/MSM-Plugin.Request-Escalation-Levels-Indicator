@@ -1,0 +1,12 @@
+﻿{
+    "Name": "MarvalBaltic.Plugins.RequestEscalationLevelsIndicator",
+    "Organisation": "Marval Baltic",
+    "DisplayName": "Request Escalation Levels Indicator",
+    "Icon": "service_level_indicators_16.png",
+    "Version": "1.1",
+    "SupportedVersions": [ "14.18" ],
+    "Pages": [ "Request.aspx" ],
+    "HtmlImportFile": "RequestSLI.html",
+    "TagName": "marval-baltic-plugins-request-sli",
+    "GlobalSettings": []
+}
