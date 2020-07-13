@@ -26,7 +26,7 @@
         var $ = window.top.$;
         MarvalSoftware.Plugins.define(_pluginId,
             {
-                _pluginDebug: true,
+                _pluginDebug: false,
                 _pluginHandlerRequest: null,
 
                 _getPluginPath: function () {
@@ -89,13 +89,13 @@
                         htmlContent.innerHTML = document.querySelector('.indicators_template').innerHTML;
                         
                         $(htmlContent).find("#request-escalation-indicators-sla > span").attr("class","escalation" + escalationLevels.Sla);
-                        $(htmlContent).find("#request-escalation-indicators-section-sla").attr("title","SLA Escalation Level: " + escalationLevels.Sla);
+                        $(htmlContent).find("#request-escalation-indicators-section-sla").attr("title","SLA Escalation Level: " + escalationLevels.Sla + (escalationLevels.Sla == escalationLevels.Inactive ? " (Inactive)" : "" ) + (escalationLevels.Sla == escalationLevels.New ? " (New)" : "" ) + (escalationLevels.Sla == escalationLevels.Breached ? " (Breached)" : "" ));
 
                         $(htmlContent).find("#request-escalation-indicators-ola > span").attr("class","escalation" + escalationLevels.Ola);
-                        $(htmlContent).find("#request-escalation-indicators-section-ola").attr("title","OLA Escalation Level: " + escalationLevels.Ola);
+                        $(htmlContent).find("#request-escalation-indicators-section-ola").attr("title","OLA Escalation Level: " + escalationLevels.Ola + (escalationLevels.Ola == escalationLevels.Inactive ? " (Inactive)" : "" ) + (escalationLevels.Ola == escalationLevels.New ? " (New)" : "" ) + (escalationLevels.Ola == escalationLevels.Breached ? " (Breached)" : "" ));
 
                         $(htmlContent).find("#request-escalation-indicators-uc > span").attr("class","escalation" + escalationLevels.Uc);
-                        $(htmlContent).find("#request-escalation-indicators-section-uc").attr("title","UC Escalation Level: " + escalationLevels.Uc);
+                        $(htmlContent).find("#request-escalation-indicators-section-uc").attr("title","UC Escalation Level: " + escalationLevels.Uc + (escalationLevels.Uc == escalationLevels.Inactive ? " (Inactive)" : "" ) + (escalationLevels.Uc == escalationLevels.New ? " (New)" : "" ) + (escalationLevels.Uc == escalationLevels.Breached ? " (Breached)" : "" ));
 
                         sl_container[0].insertBefore(plugin._getFirstChild(htmlContent), sl_container[0].childNodes[0]);
                     }

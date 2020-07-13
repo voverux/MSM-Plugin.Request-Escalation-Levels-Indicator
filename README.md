@@ -7,6 +7,8 @@ This plugin adds an extra html element to a request form to display escalation l
 | Plugin  | MSM              | Comment
 |---------|------------------|----------------------
 | 1.1     | 14.18            | Initial version
+| 1.2     | 14.18            | Debug logging disabled
+| 1.4     | 14.18            | Excalation level indicator title extended with general level names
 
 ## Installation
 

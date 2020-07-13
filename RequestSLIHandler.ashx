@@ -48,7 +48,10 @@ public class RequestSLIHandler : PluginHandler
     private EscalationLevels getRequestEscalationLevels(int requestId)
     {
         SystemSettingsInfo settings = new SystemSettingsBroker().GetSystemSettings();
-        EscalationLevels el = new EscalationLevels(settings.EscalationLevelIndicatorInactive);
+		int lvlInactive = (int)settings.EscalationLevelIndicatorInactive;
+		int lvlNew = (int)settings.EscalationLevelIndicatorNew;
+		int lvlBreached = (int)settings.EscalationLevelIndicatorBreached;
+        EscalationLevels el = new EscalationLevels(lvlInactive, lvlNew, lvlBreached);
         try
         {
             RequestBroker broker = new RequestBroker();
@@ -85,7 +88,7 @@ public class RequestSLIHandler : PluginHandler
                 if(rq.ServiceLevelAgreement != null)
 				{
                     el.Notes += "SLA exists. ";
-                    el.Sla = (int)settings.EscalationLevelIndicatorNew;
+                    el.Sla = lvlNew;
                     isOnHold = rq.IsOnHold && rq.ServiceLevelAgreement.ServiceLevels.DeductTimeInHoldState == HoldTimeBehaviours.DeductInRealTime;
 					
 					responseBreached = requestBreachDates.SlaBreaches.ActualResponseBreach > DateTime.MinValue;
@@ -97,7 +100,7 @@ public class RequestSLIHandler : PluginHandler
 						if(rq.IsFixed())
 						{
                             el.Notes += "Is fixed. ";
-							el.Sla = (int)settings.EscalationLevelIndicatorInactive;
+							el.Sla = lvlInactive;
 						}
 						else
 						{
@@ -105,7 +108,7 @@ public class RequestSLIHandler : PluginHandler
 							if(fixBreached)
                             {
                                 el.Notes += "SLA Fix is breached. ";
-                                el.Sla = (int)settings.EscalationLevelIndicatorBreached;
+                                el.Sla = lvlBreached;
                             }
                             else
 							{
@@ -113,7 +116,7 @@ public class RequestSLIHandler : PluginHandler
 								if(isOnHold)
 								{
                                     el.Notes += "SLA is on hold. ";
-									el.Sla = (int)settings.EscalationLevelIndicatorInactive;
+									el.Sla = lvlInactive;
 								}
 								else
 								{
@@ -133,7 +136,7 @@ public class RequestSLIHandler : PluginHandler
 						if(responseBreached)
                         {
                             el.Notes += "SLA Response is breached. ";
-                            el.Sla = (int)settings.EscalationLevelIndicatorBreached;
+                            el.Sla = lvlBreached;
                         }
                         else
 						{
@@ -141,7 +144,7 @@ public class RequestSLIHandler : PluginHandler
 							if(isOnHold)
 							{
                                 el.Notes += "SLA is on hold. ";
-								el.Sla = (int)settings.EscalationLevelIndicatorInactive;
+								el.Sla = lvlInactive;
 							}
 							else
 							{
@@ -164,7 +167,7 @@ public class RequestSLIHandler : PluginHandler
                 if(rq.CurrentOperationalLevelAgreement != null)
 				{
                     el.Notes += "OLA exists. ";
-                    el.Ola = (int)settings.EscalationLevelIndicatorNew;
+                    el.Ola = lvlNew;
                     isOnHold = rq.IsOnHold && rq.CurrentOperationalLevelAgreement.ServiceLevels.DeductTimeInHoldState == HoldTimeBehaviours.DeductInRealTime;
 					responseBreached = requestBreachDates.OlaBreaches.ActualResponseBreach > DateTime.MinValue;
 					fixBreached = requestBreachDates.OlaBreaches.ActualFixBreach > DateTime.MinValue;
@@ -177,7 +180,7 @@ public class RequestSLIHandler : PluginHandler
 						if(isAssignmentCompleted)
 						{
                             el.Notes += "OLA Assignment is completed. ";
-							el.Ola = (int)settings.EscalationLevelIndicatorInactive;
+							el.Ola = lvlInactive;
 						}
 						else
 						{
@@ -185,7 +188,7 @@ public class RequestSLIHandler : PluginHandler
 							if(fixBreached)
                             {
                                 el.Notes += "OLA Fix is breached. ";
-                                el.Ola = (int)settings.EscalationLevelIndicatorBreached;
+                                el.Ola = lvlBreached;
                             }
                             else
 							{
@@ -193,7 +196,7 @@ public class RequestSLIHandler : PluginHandler
 								if(isOnHold)
 								{
                                     el.Notes += "OLA is on hold. ";
-									el.Ola = (int)settings.EscalationLevelIndicatorInactive;
+									el.Ola = lvlInactive;
 								}
 								else
 								{
@@ -213,7 +216,7 @@ public class RequestSLIHandler : PluginHandler
 						if(responseBreached)
                         {
                             el.Notes += "OLA Assignment Response is breached. ";
-                            el.Ola = (int)settings.EscalationLevelIndicatorBreached;
+                            el.Ola = lvlBreached;
                         }
                         else
 						{
@@ -221,7 +224,7 @@ public class RequestSLIHandler : PluginHandler
 							if(isOnHold)
 							{
                                 el.Notes += "OLA is on hold. ";
-								el.Ola = (int)settings.EscalationLevelIndicatorInactive;
+								el.Ola = lvlInactive;
 							}
 							else
 							{
@@ -245,7 +248,7 @@ public class RequestSLIHandler : PluginHandler
                 if(rq.CurrentUnderpinningContract != null)
 				{
                     el.Notes += "UC exists. ";
-                    el.Uc = (int)settings.EscalationLevelIndicatorNew;
+                    el.Uc = lvlNew;
                     isOnHold = rq.IsOnHold && rq.CurrentUnderpinningContract.ServiceLevels.DeductTimeInHoldState == HoldTimeBehaviours.DeductInRealTime;
 					responseBreached = requestBreachDates.UcBreaches.ActualResponseBreach > DateTime.MinValue;
 					fixBreached = requestBreachDates.UcBreaches.ActualFixBreach > DateTime.MinValue;
@@ -258,7 +261,7 @@ public class RequestSLIHandler : PluginHandler
 						if(isAssignmentCompleted)
 						{
                             el.Notes += "UC Assignment is completed. ";
-							el.Uc = (int)settings.EscalationLevelIndicatorInactive;
+							el.Uc = lvlInactive;
 						}
 						else
 						{
@@ -266,7 +269,7 @@ public class RequestSLIHandler : PluginHandler
 							if(fixBreached)
                             {
                                 el.Notes += "UC Fix is breached. ";
-                                el.Uc = (int)settings.EscalationLevelIndicatorBreached;
+                                el.Uc = lvlBreached;
                             }
                             else
 							{
@@ -274,7 +277,7 @@ public class RequestSLIHandler : PluginHandler
 								if(isOnHold)
 								{
                                     el.Notes += "UC is on hold. ";
-									el.Uc = (int)settings.EscalationLevelIndicatorInactive;
+									el.Uc = lvlInactive;
 								}
 								else
 								{
@@ -294,7 +297,7 @@ public class RequestSLIHandler : PluginHandler
 						if(responseBreached)
                         {
                             el.Notes += "UC Assignment Response is breached. ";
-                            el.Uc = (int)settings.EscalationLevelIndicatorBreached;
+                            el.Uc = lvlBreached;
                         }
                         else
 						{
@@ -302,7 +305,7 @@ public class RequestSLIHandler : PluginHandler
 							if(isOnHold)
 							{
                                 el.Notes += "UC is on hold. ";
-								el.Uc = (int)settings.EscalationLevelIndicatorInactive;
+								el.Uc = lvlInactive;
 							}
 							else
 							{
@@ -334,6 +337,9 @@ public class RequestSLIHandler : PluginHandler
         public int Sla { get; set; }
         public int Ola { get; set; }
         public int Uc { get; set; }
+        public int Inactive { get; set; }
+        public int New { get; set; }
+        public int Breached { get; set; }
         public string Notes { get; set; }
 
         public EscalationLevels()
@@ -341,13 +347,19 @@ public class RequestSLIHandler : PluginHandler
             this.Sla = 1;
             this.Ola = 1;
             this.Uc = 1;
+            this.Inactive = 1;
+            this.New = 3;
+            this.Breached = 6;
             this.Notes = string.Empty;
         }
-        public EscalationLevels(int InactiveLevel)
+        public EscalationLevels(int InactiveLevel, int NewLevel, int BreachedLevel)
         {
             this.Sla = InactiveLevel;
             this.Ola = InactiveLevel;
             this.Uc = InactiveLevel;
+            this.Inactive = InactiveLevel;
+            this.New = NewLevel;
+            this.Breached = BreachedLevel;
             this.Notes = string.Empty;
         }
     }
