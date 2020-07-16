@@ -89,34 +89,38 @@ public class RequestSLIHandler : PluginHandler
 				{
                     el.Notes += "SLA exists. ";
                     el.Sla = lvlNew;
+                    el.SlaState = "Response: New";
                     isOnHold = rq.IsOnHold && rq.ServiceLevelAgreement.ServiceLevels.DeductTimeInHoldState == HoldTimeBehaviours.DeductInRealTime;
-					
 					responseBreached = requestBreachDates.SlaBreaches.ActualResponseBreach > DateTime.MinValue;
 					fixBreached = requestBreachDates.SlaBreaches.ActualFixBreach > DateTime.MinValue;
 					
 					if(rq.IsRespondedTo())
 					{
+                        el.SlaState = "Fix: New";
                         el.Notes += "SLA is responded. ";
 						if(rq.IsFixed())
 						{
-                            el.Notes += "Is fixed. ";
 							el.Sla = lvlInactive;
+							el.SlaState = "Fix: Inactive (fixed)";
+                            el.Notes += "Is fixed. ";
 						}
 						else
 						{
                             el.Notes += "Is not fixed. ";
 							if(fixBreached)
                             {
-                                el.Notes += "SLA Fix is breached. ";
                                 el.Sla = lvlBreached;
+								el.SlaState = "Fix: Breached";
+                                el.Notes += "SLA Fix is breached. ";
                             }
                             else
 							{
                                 el.Notes += "SLA Fix not breached. ";
 								if(isOnHold)
 								{
-                                    el.Notes += "SLA is on hold. ";
 									el.Sla = lvlInactive;
+									el.SlaState = "Fix: Inactive (on hold)";
+                                    el.Notes += "SLA is on hold. ";
 								}
 								else
 								{
@@ -124,6 +128,7 @@ public class RequestSLIHandler : PluginHandler
 									if (rq.CalculatedCurrentEscalationLevels.SlaFixEscalation != null && rq.CalculatedCurrentEscalationLevels.SlaFixEscalation.EscalationPoint != null)
                                     {
 										el.Sla = rq.CalculatedCurrentEscalationLevels.SlaFixEscalation.EscalationPoint.IndicatorLevel;
+										el.SlaState = "Fix: In progress";
                                         el.Notes += "SLA Fix EP level:" + el.Sla + " ";
                                     }
 								}
@@ -135,16 +140,18 @@ public class RequestSLIHandler : PluginHandler
                         el.Notes += "SLA is not responded. ";
 						if(responseBreached)
                         {
-                            el.Notes += "SLA Response is breached. ";
                             el.Sla = lvlBreached;
+							el.SlaState = "Response: Breached";
+                            el.Notes += "SLA Response is breached. ";
                         }
                         else
 						{
                             el.Notes += "SLA Response is not breached. ";
 							if(isOnHold)
 							{
-                                el.Notes += "SLA is on hold. ";
 								el.Sla = lvlInactive;
+    							el.SlaState = "Response: Inactive (on hold)";
+                                el.Notes += "SLA is on hold. ";
 							}
 							else
 							{
@@ -152,6 +159,7 @@ public class RequestSLIHandler : PluginHandler
 								if(rq.CalculatedCurrentEscalationLevels.SlaResponseEscalation != null && rq.CalculatedCurrentEscalationLevels.SlaResponseEscalation.EscalationPoint != null)
                                 {
                                     el.Sla = rq.CalculatedCurrentEscalationLevels.SlaResponseEscalation.EscalationPoint.IndicatorLevel;
+        							el.SlaState = "Response: In progress";
                                     el.Notes += "SLA Response EP level:" + el.Sla + " ";
                                 }
 							}
@@ -160,6 +168,7 @@ public class RequestSLIHandler : PluginHandler
                 }
                 else
 				{
+					el.SlaState = "Inactive (not assigned)";
                     el.Notes += "SLA is not assigned. ";
                 }
 
@@ -168,6 +177,7 @@ public class RequestSLIHandler : PluginHandler
 				{
                     el.Notes += "OLA exists. ";
                     el.Ola = lvlNew;
+                    el.OlaState = "Response: New";
                     isOnHold = rq.IsOnHold && rq.CurrentOperationalLevelAgreement.ServiceLevels.DeductTimeInHoldState == HoldTimeBehaviours.DeductInRealTime;
 					responseBreached = requestBreachDates.OlaBreaches.ActualResponseBreach > DateTime.MinValue;
 					fixBreached = requestBreachDates.OlaBreaches.ActualFixBreach > DateTime.MinValue;
@@ -176,27 +186,31 @@ public class RequestSLIHandler : PluginHandler
 					
 					if(isAssignmentResponded)
 					{
+                        el.OlaState = "Fix: New";
                         el.Notes += "OLA Assignment is responded. ";
 						if(isAssignmentCompleted)
 						{
-                            el.Notes += "OLA Assignment is completed. ";
 							el.Ola = lvlInactive;
+							el.OlaState = "Fix: Inactive (completed)";
+                            el.Notes += "OLA Assignment is completed. ";
 						}
 						else
 						{
                             el.Notes += "OLA Assignment is not completed. ";
 							if(fixBreached)
                             {
-                                el.Notes += "OLA Fix is breached. ";
                                 el.Ola = lvlBreached;
+								el.OlaState = "Fix: Breached";
+                                el.Notes += "OLA Fix is breached. ";
                             }
                             else
 							{
                                 el.Notes += "OLA Fix not breached. ";
 								if(isOnHold)
 								{
-                                    el.Notes += "OLA is on hold. ";
 									el.Ola = lvlInactive;
+									el.OlaState = "Fix: Inactive (on hold)";
+                                    el.Notes += "OLA is on hold. ";
 								}
 								else
 								{
@@ -204,6 +218,7 @@ public class RequestSLIHandler : PluginHandler
 									if (rq.CalculatedCurrentEscalationLevels.OlaFixEscalation != null && rq.CalculatedCurrentEscalationLevels.OlaFixEscalation.EscalationPoint != null)
                                     {
 										el.Ola = rq.CalculatedCurrentEscalationLevels.OlaFixEscalation.EscalationPoint.IndicatorLevel;
+										el.OlaState = "Fix: In progress";
                                         el.Notes += "OLA Fix EP level:" + el.Ola + " ";
                                     }
 								}
@@ -215,16 +230,18 @@ public class RequestSLIHandler : PluginHandler
                         el.Notes += "OLA Assignment is not responded. ";
 						if(responseBreached)
                         {
-                            el.Notes += "OLA Assignment Response is breached. ";
                             el.Ola = lvlBreached;
+							el.OlaState = "Response: Breached";
+                            el.Notes += "OLA Assignment Response is breached. ";
                         }
                         else
 						{
                             el.Notes += "OLA Assignment Response is not breached. ";
 							if(isOnHold)
 							{
-                                el.Notes += "OLA is on hold. ";
 								el.Ola = lvlInactive;
+    							el.OlaState = "Response: Inactive (on hold)";
+                                el.Notes += "OLA is on hold. ";
 							}
 							else
 							{
@@ -232,6 +249,7 @@ public class RequestSLIHandler : PluginHandler
 								if(rq.CalculatedCurrentEscalationLevels.OlaResponseEscalation != null && rq.CalculatedCurrentEscalationLevels.OlaResponseEscalation.EscalationPoint != null)
                                 {
                                     el.Ola = rq.CalculatedCurrentEscalationLevels.OlaResponseEscalation.EscalationPoint.IndicatorLevel;
+        							el.OlaState = "Response: In progress";
                                     el.Notes += "OLA Response EP level:" + el.Ola + " ";
                                 }
 							}
@@ -240,6 +258,7 @@ public class RequestSLIHandler : PluginHandler
                 }
                 else
 				{
+					el.OlaState = "Inactive (not assigned)";
                     el.Notes += "OLA is not assigned. ";
                 }
 
@@ -249,6 +268,7 @@ public class RequestSLIHandler : PluginHandler
 				{
                     el.Notes += "UC exists. ";
                     el.Uc = lvlNew;
+                    el.UcState = "Response: New";
                     isOnHold = rq.IsOnHold && rq.CurrentUnderpinningContract.ServiceLevels.DeductTimeInHoldState == HoldTimeBehaviours.DeductInRealTime;
 					responseBreached = requestBreachDates.UcBreaches.ActualResponseBreach > DateTime.MinValue;
 					fixBreached = requestBreachDates.UcBreaches.ActualFixBreach > DateTime.MinValue;
@@ -257,27 +277,31 @@ public class RequestSLIHandler : PluginHandler
 					
 					if(isAssignmentResponded)
 					{
+                        el.UcState = "Fix: New";
                         el.Notes += "UC Assignment is responded. ";
 						if(isAssignmentCompleted)
 						{
-                            el.Notes += "UC Assignment is completed. ";
 							el.Uc = lvlInactive;
+							el.OlaState = "Fix: Inactive (completed)";
+                            el.Notes += "UC Assignment is completed. ";
 						}
 						else
 						{
                             el.Notes += "UC Assignment is not completed. ";
 							if(fixBreached)
                             {
-                                el.Notes += "UC Fix is breached. ";
                                 el.Uc = lvlBreached;
+								el.UcState = "Fix: Breached";
+                                el.Notes += "UC Fix is breached. ";
                             }
                             else
 							{
                                 el.Notes += "UC Fix not breached. ";
 								if(isOnHold)
 								{
-                                    el.Notes += "UC is on hold. ";
 									el.Uc = lvlInactive;
+									el.UcState = "Fix: Inactive (on hold)";
+                                    el.Notes += "UC is on hold. ";
 								}
 								else
 								{
@@ -285,6 +309,7 @@ public class RequestSLIHandler : PluginHandler
 									if (rq.CalculatedCurrentEscalationLevels.UcFixEscalation != null && rq.CalculatedCurrentEscalationLevels.UcFixEscalation.EscalationPoint != null)
                                     {
 										el.Uc = rq.CalculatedCurrentEscalationLevels.UcFixEscalation.EscalationPoint.IndicatorLevel;
+										el.UcState = "Fix: In progress";
                                         el.Notes += "UC Fix EP level:" + el.Uc + " ";
                                     }
 								}
@@ -296,16 +321,18 @@ public class RequestSLIHandler : PluginHandler
                         el.Notes += "UC Assignment is not responded. ";
 						if(responseBreached)
                         {
-                            el.Notes += "UC Assignment Response is breached. ";
                             el.Uc = lvlBreached;
+							el.UcState = "Response: Breached";
+                            el.Notes += "UC Assignment Response is breached. ";
                         }
                         else
 						{
                             el.Notes += "UC Assignment Response is not breached. ";
 							if(isOnHold)
 							{
-                                el.Notes += "UC is on hold. ";
 								el.Uc = lvlInactive;
+    							el.UcState = "Response: Inactive (on hold)";
+                                el.Notes += "UC is on hold. ";
 							}
 							else
 							{
@@ -313,6 +340,7 @@ public class RequestSLIHandler : PluginHandler
 								if(rq.CalculatedCurrentEscalationLevels.UcResponseEscalation != null && rq.CalculatedCurrentEscalationLevels.UcResponseEscalation.EscalationPoint != null)
                                 {
                                     el.Uc = rq.CalculatedCurrentEscalationLevels.UcResponseEscalation.EscalationPoint.IndicatorLevel;
+        							el.UcState = "Response: In progress";
                                     el.Notes += "UC Response EP level:" + el.Uc + " ";
                                 }
 							}
@@ -321,6 +349,7 @@ public class RequestSLIHandler : PluginHandler
                 }
                 else
 				{
+					el.UcState = "Inactive (not assigned)";
                     el.Notes += "UC is not assigned. ";
                 }
             }
@@ -337,6 +366,9 @@ public class RequestSLIHandler : PluginHandler
         public int Sla { get; set; }
         public int Ola { get; set; }
         public int Uc { get; set; }
+        public string SlaState { get; set; }
+        public string OlaState { get; set; }
+        public string UcState { get; set; }
         public int Inactive { get; set; }
         public int New { get; set; }
         public int Breached { get; set; }
@@ -347,6 +379,9 @@ public class RequestSLIHandler : PluginHandler
             this.Sla = 1;
             this.Ola = 1;
             this.Uc = 1;
+            this.SlaState = string.Empty;
+            this.OlaState = string.Empty;
+            this.UcState = string.Empty;
             this.Inactive = 1;
             this.New = 3;
             this.Breached = 6;
@@ -357,6 +392,9 @@ public class RequestSLIHandler : PluginHandler
             this.Sla = InactiveLevel;
             this.Ola = InactiveLevel;
             this.Uc = InactiveLevel;
+            this.SlaState = string.Empty;
+            this.OlaState = string.Empty;
+            this.UcState = string.Empty;
             this.Inactive = InactiveLevel;
             this.New = NewLevel;
             this.Breached = BreachedLevel;

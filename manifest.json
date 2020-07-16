@@ -3,7 +3,7 @@
     "Organisation": "Marval Baltic",
     "DisplayName": "Request Escalation Levels Indicator",
     "Icon": "service_level_indicators_16.png",
-    "Version": "1.4",
+    "Version": "1.5",
     "SupportedVersions": [ "14.18" ],
     "Pages": [ "Request.aspx" ],
     "HtmlImportFile": "RequestSLI.html",
